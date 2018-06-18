@@ -1,7 +1,12 @@
 from ftplib import FTP
 import datetime
+import csv
 ##import schedule
+# pip install firebase-admin google-cloud-firestore
+from firebase import firebase
 import time
+
+
 class setUp:
     def __init__(self):
         self._ftp = ''
@@ -33,7 +38,10 @@ class setUp:
     def setDate(self):
         self._date = datetime.datetime.now()
     def getDate(self):
-        return str(self._date).replace(':','-').replace(' ','-').replace('.','-').split('-')[-1]
+        return str(self._date).replace(':','-').replace(' ','-').replace('.','-').split('-')[:-1]
+
+
+     
 
 def getFile(ftp, filename):
     try:
@@ -52,8 +60,19 @@ def job(obj):
     for line in data:
         print("-", line)
     getFile(ftp,obj.getCSV_name()+'.csv')
-    ftp.quit()
-    ftp.close()
+  #  ftp.quit()
+  #  ftp.close()
+def csvfile(file_name):
+    file=open(file_name,'r',encoding='utf-8')
+    csvCursor=csv.reader(file)
+    for row in csvCursor:
+        Voltage=row[6]
+        Amphere=row[7]
+        float(Voltage)
+        float(Amphere)
+        print(Voltage*Amphere)
+    file.close()
+
     
 def main():
     '''set up here'''
@@ -66,5 +85,8 @@ def main():
     obj.setCSV_name(obj.getDate()[1]+obj.getDate()[2]+'_'+obj.getDate()[3])
     '''///////////'''
     job(obj)
+    file_name=str(obj.getDate()[1]+obj.getDate()[2]+'_'+obj.getDate()[3])
+    print('Parsing csv'+file_name)
+    csvfile(file_name+'.csv')
 if __name__ == "__main__":
     main()
