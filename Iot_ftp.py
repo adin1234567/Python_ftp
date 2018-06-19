@@ -1,8 +1,7 @@
 from ftplib import FTP
 import datetime
 import csv
-##import schedule
-# pip install firebase-admin google-cloud-firestore
+import schedule
 from firebase import firebase
 import time
 
@@ -74,6 +73,7 @@ def csvfile(file_name):
     csvCursor=csv.reader(file)
     next(csvCursor, None)
     fb.delete(file_name,None)
+    time_quarter=(datetime.datetime.now().minute//5)
     for row in csvCursor:
         Voltage=row[6]
         Ampere=row[7]
@@ -82,13 +82,15 @@ def csvfile(file_name):
         i=float(Ampere)  
         t=float(B_temp)
         back_temp=str(round(t*100/32768,2))
+        print('-------\n')
         print('Debug: \\Pushing Time:'+row[1])
+        print('Debug: Pushing parameters Time Devider:'+str(time_quarter))
         print('Debug: Pushing parameters Voltage:'+str(v))
         print("Debug: Pushing parameters Ampere:"+str(i))
         print("Debug: Pushing parameters Power:"+str(v*i))
         print("Debug: Pushing parameters Back Temperature:"+back_temp)
-        fb.post(file_name,{'Time':row[1],'Voltage':str(v),'Ampere':str(i),'Power':str(v*i),'Back_temp':back_temp})
-  
+        fb.post(file_name,{'Time':row[1],'Quater':time_quarter,'Voltage':str(v),'Ampere':str(i),'Power':str(v*i),'Back_temp':back_temp})
+        time_quarter=time_quarter-1
     
     # result = fb.get('/users', '1')
     # print(result)
