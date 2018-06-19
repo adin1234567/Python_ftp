@@ -47,13 +47,15 @@ def getFile(ftp, filename):
     try:
         ftp.retrbinary("RETR " + filename ,open(filename, 'wb').write)
     except:
-        print("Error")
+        print("Debug: Error in getFile()")
 
 
 def job(obj):
-    ftp = FTP(obj.getFTP())
-    ftp.login(obj.getUser(),obj.getPassword())
-    print('Will download:'+obj.getCSV_name())
+    print('Debug: running job')
+    print('Debug: getting FTP information...')
+    ftp=FTP(obj.getFTP())
+    ftp.login(obj.getUser(),obj.getPassword())	
+    print('Debug: Will download:'+obj.getCSV_name())
     ftp.cwd(obj.getCSV_folder())
     data = []
     ftp.dir(data.append)
@@ -64,6 +66,8 @@ def job(obj):
     # ftp.quit()
     # ftp.close()
 def csvfile(file_name):
+	# print("Debug: running csvfile()")
+	# print("Debug: Parsing csvfile")
     file=open(file_name+'.csv','r',encoding='utf-8')
     url='https://monitor-1d512.firebaseio.com/' 
     fb=firebase.FirebaseApplication(url,None)
@@ -72,15 +76,18 @@ def csvfile(file_name):
     fb.delete(file_name,None)
     for row in csvCursor:
         Voltage=row[6]
-        Amphere=row[7]
+        Ampere=row[7]
         B_temp=row[2]
         v=float(Voltage)
-        i=float(Amphere)  
+        i=float(Ampere)  
         t=float(B_temp)
         back_temp=str(round(t*100/32768,2))
-        print(str(v*i))
-        
-        fb.post(file_name,{'Time':row[1],'Power':str(v*i),'Back_temp':back_temp})
+        print('Debug: \\Pushing Time:'+row[1])
+        print('Debug: Pushing parameters Voltage:'+str(v))
+        print("Debug: Pushing parameters Ampere:"+str(i))
+        print("Debug: Pushing parameters Power:"+str(v*i))
+        print("Debug: Pushing parameters Back Temperature:"+back_temp)
+        fb.post(file_name,{'Time':row[1],'Voltage':str(v),'Ampere':str(i),'Power':str(v*i),'Back_temp':back_temp})
   
     
     # result = fb.get('/users', '1')
