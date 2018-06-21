@@ -89,7 +89,16 @@ def csvfile(file_name):
         print("Debug: Pushing parameters Ampere:"+str(i))
         print("Debug: Pushing parameters Power:"+str(v*i))
         print("Debug: Pushing parameters Back Temperature:"+back_temp)
-        fb.post(file_name,{'Time':row[1],'Quater':time_quarter,'Voltage':str(v),'Ampere':str(i),'Power':str(v*i),'Back_temp':back_temp})
+        
+        fb.put(file_name+"/"+str(time_quarter),'Time',row[1])
+        fb.put(file_name+"/"+str(time_quarter),'Voltage',str(v))
+        fb.put(file_name+"/"+str(time_quarter),'Ampere',str(i))
+        fb.put(file_name+"/"+str(time_quarter),'Power',str(v*i))
+        fb.put(file_name+"/"+str(time_quarter),'Temp',back_temp)
+    
+
+        
+       
         time_quarter=time_quarter-1
     
     # result = fb.get('/users', '1')
