@@ -71,9 +71,10 @@ def csvfile(file_name):
     url='https://monitor-1d512.firebaseio.com/' 
     fb=firebase.FirebaseApplication(url,None)
     csvCursor=csv.reader(file)
-    next(csvCursor, None)
-    fb.delete(file_name,None)
     time_quarter=(datetime.datetime.now().minute//5)
+    for x in range(time_quarter+1):
+        next(csvCursor, None)
+    # fb.delete(file_name,None)    
     for row in csvCursor:
         Voltage=row[6]
         Ampere=row[7]
@@ -82,24 +83,31 @@ def csvfile(file_name):
         i=float(Ampere)  
         t=float(B_temp)
         back_temp=str(round(t*100/32768,2))
-        print('-------\n')
-        print('Debug: \\Pushing Time:'+row[1])
-        print('Debug: Pushing parameters Time Devider:'+str(time_quarter))
-        print('Debug: Pushing parameters Voltage:'+str(v))
-        print("Debug: Pushing parameters Ampere:"+str(i))
-        print("Debug: Pushing parameters Power:"+str(v*i))
-        print("Debug: Pushing parameters Back Temperature:"+back_temp)
+
+        result=fb.get(file_name+"/"+str(time_quarter),None)
         
-        fb.put(file_name+"/"+str(time_quarter),'Time',row[1])
-        fb.put(file_name+"/"+str(time_quarter),'Voltage',str(v))
-        fb.put(file_name+"/"+str(time_quarter),'Ampere',str(i))
-        fb.put(file_name+"/"+str(time_quarter),'Power',str(v*i))
-        fb.put(file_name+"/"+str(time_quarter),'Temp',back_temp)
+        if result==None:  
+            print('Debug: Pushing new data')   
+            print('-------\n')
+            print('Debug: \\Pushing Time:'+row[1])
+            print('Debug: Pushing parameters Time Devider:'+str(time_quarter))
+            print('Debug: Pushing parameters Voltage:'+str(v))
+            print("Debug: Pushing parameters Ampere:"+str(i))
+            print("Debug: Pushing parameters Power:"+str(v*i))
+            print("Debug: Pushing parameters Back Temperature:"+back_temp)
+            fb.put(file_name+"/"+str(time_quarter),'Time',row[1])
+            fb.put(file_name+"/"+str(time_quarter),'Voltage',str(v))
+            fb.put(file_name+"/"+str(time_quarter),'Ampere',str(i))
+            fb.put(file_name+"/"+str(time_quarter),'Power',str(v*i))
+            fb.put(file_name+"/"+str(time_quarter),'Temp',back_temp)       
+            return
+        print('Debug: Data already exist, return')
+
     
 
         
        
-        time_quarter=time_quarter-1
+        # time_quarter=time_quarter-1
     
     # result = fb.get('/users', '1')
     # print(result)
